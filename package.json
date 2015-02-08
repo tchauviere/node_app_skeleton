@@ -1,0 +1,16 @@
+{
+  "name": "seo_project",
+  "version": "1.0.0",
+  "description": "SEO Tools Dashboard",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Thibaud Chauviere (tchauviere)",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.11.1",
+    "socket.io": "^1.3.2",
+    "swig": "^1.4.2"
+  }
+}
