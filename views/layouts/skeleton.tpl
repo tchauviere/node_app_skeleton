@@ -16,8 +16,10 @@
         {% endblock %}
 
         {% block js %}
-            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-            <script src="media/js/bootstrap.min.js"></script>
+            <script src="media/js/libs/jquery-2.1.3.min.js"></script>
+            <script src="media/js/libs/bootstrap.min.js"></script>
+            <script src="{{server_address}}{{socket_io_lib}}"></script>
+            <script data-main="media/js/app" src="media/js/libs/require.js"></script>
         {% endblock %}
     </head>
 
