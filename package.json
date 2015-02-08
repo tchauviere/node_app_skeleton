@@ -1,13 +1,13 @@
 {
-  "name": "seo_project",
+  "name": "node_app_skeleton",
   "version": "1.0.0",
-  "description": "SEO Tools Dashboard",
+  "description": "Node App Skeleton",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Thibaud Chauviere (tchauviere)",
-  "license": "ISC",
+  "license": "*",
   "dependencies": {
     "express": "^4.11.1",
     "socket.io": "^1.3.2",
