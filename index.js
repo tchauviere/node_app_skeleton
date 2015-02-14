@@ -6,18 +6,12 @@ var path = require('path');
 var http = require('http');
 var server = http.createServer(app);
 var io = socket.listen(server);
-var minify = require('express-minify');
 
 // Conf
 server.listen(3000);
 console.log('Application Started on http://localhost:'+server.address().port);
 app.use('/media', express.static(path.join(__dirname, 'public')));
-// CSS/JS Minifier
-app.use(minify({
-    js_match: /javascript/,
-    css_match: /css/,
-    cache: path.join(__dirname, 'cache')
-}));
+
 // Make express aut run Swig Templating
 app.engine('tpl', swig.renderFile);
 app.set('view engine', 'tpl');
