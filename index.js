@@ -1,88 +1,75 @@
-var socket = require('socket.io');
+/**
+ * Module dependencies
+ */
+
+/* HTTP Server */
+var http = require('http');
 var express = require('express');
 var app = express();
+var server = http.createServer(app);
+/* Libs */
+var socket = require('socket.io');
 var swig = require('swig');
 var path = require('path');
-var http = require('http');
-var server = http.createServer(app);
+var uuid = require('uuid');
 var io = socket.listen(server);
+/* Middlewares */
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var bodyParser = require('body-parser');
+/* Controllers */
+var Main = require('./controllers/Main');
+/* Config */
+var Config = require('./config/Config');
 
-// Conf
-server.listen(3000);
-console.log('Application Started on http://localhost:'+server.address().port);
+/**
+* Server configuration
+*/
+console.log('ENV',Config.__env);
+console.log('LISTNING PORT', Config.__port);
+console.log('EXPRESS CACHE', Config.__express_cache);
+console.log('SWIG CACHE', Config.__swig_cache);
+server.listen(Config.__port);
+console.log('App started on http://localhost:'+Config.__port);
+// Static content folder declaration
 app.use('/media', express.static(path.join(__dirname, 'public')));
-
-// Make express aut run Swig Templating
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
+// parse application/json
+app.use(bodyParser.json());
+app.use(session({
+	genid: function(req) {
+		return uuid.v4(); // use UUIDs for session IDs
+	},
+	secret: 'smithcraft',
+	secure: true,
+	resave: false,
+	saveUninitialized: false
+}));
+// Make Express use Swig templating (with .tpl extensions)
 app.engine('tpl', swig.renderFile);
 app.set('view engine', 'tpl');
 app.set('views', path.join(__dirname, 'views'));
-// Swig will cache templates for you, but you can disable
-// that and use Express's caching instead, if you like:
-app.set('view cache', false);
-// To disable Swig's cache, do the following:
-swig.setDefaults({ cache: false });
 // NOTE: You should always cache templates in a production environment.
 // Don't leave both of these to `false` in production!
+// Production uses Express caching system for Swig templates
+app.set('view cache', Config.__express_cache);
+// Force Swig to disable its own cache, we don't need since we use Express' one
+swig.setDefaults({ cache: Config.__swig_cache });
 
-
-// Routing
-app.get('/', function (req, res) {
-  res.render('content/home', { server_address: 'http://localhost:'+server.address().port,
-                               socket_io_lib: '/socket.io/socket.io.js'
-                            });
+/**
+ * Routing declaration
+ */
+app.all('/', function (req, res, next) {
+	Main.run(req, res, next);
+  /**/
 });
 
-
-/* Socket.io interactions CLIENT parts*/
+/**
+ * WebSocket Server
+ */
 io.on('connection', function (socket) {
 
-    console.log(Date.now()+" Request arrived");
-    /* Join BO room to get updates on clients
-    socket.on('join_bo', function(data){
-        if (data.token != 'undefined')
-        {
-            var cursor = bo_client_list.indexOf(data.token);
-            if (cursor == -1)
-            {
-                console.log('New Merchant');
-                bo_client_list.push(data.token);
-                socket.join('bo');
-            }
-            io.to('dashboard').emit('dashboard_update', { total_bo: bo_client_list.length });
-        }
-        else
-            console.log('ERR: No token received');
-
-    });
-
-    socket.on('leave_bo', function(data){
-        if (data.token != 'undefined')
-        {
-            var cursor = bo_client_list.indexOf(data.token);
-            if (cursor != -1)
-            {
-                console.log('Merchant left');
-                bo_client_list.splice(cursor, 1);
-                socket.leave('bo');
-                socket.disconnect();
-                io.to('dashboard').emit('dashboard_update', { total_bo: bo_client_list.length });
-
-            }
-            else
-                console.log('Token not found in existing list');
-        }
-        else
-            console.error('ERR: No token received');
-
-    });*/
-
-    /* JOIN DASHBOARD FOR LIVESTATS
-    socket.on('join_dashboard', function(data, callback){
-        socket.join('dashboard');
-        io.to('dashboard').emit('dashboard_update', { total_bo: bo_client_list.length });
-    });*/
-
 });
-
-
-
